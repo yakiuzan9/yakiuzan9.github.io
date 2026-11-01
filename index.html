@@ -1386,6 +1386,20 @@ restore();loadForm();paintChips();
 if(/Instagram|FBAN|FBAV/i.test(navigator.userAgent))$("igBanner").classList.remove("hidden");
 if(D.plan){checkWin();setView("log");maybeShowWin()}
 showInstall();if(isStandalone())track("open-app");
+// ייבוא אוטומטי מהקישור הישן (#import=...)
+(async()=>{const h=location.hash;if(!h.startsWith("#import="))return;
+  let code="";try{code=decodeURIComponent(h.slice(8))}catch(e){}
+  try{history.replaceState(null,"",location.pathname+location.search)}catch(e){}
+  let o;try{o=await unpackData(code)}catch(e){return}
+  const nd=o.D||o;if(!nd||!("days" in nd))return;
+  const has=D.plan||Object.keys(D.days).length;
+  const apply=()=>{D={form:{},plan:null,days:{},tpl:[],custom:[],win:null,winSeen:true,...nd};persist();closeSheet();loadForm();paintChips();setView(D.plan?"log":"calc");track("import-old")};
+  if(!has){apply();return}
+  $("overlay").innerHTML=`<div class="backdrop center"><div class="modal"><div class="sec-title">📥 להעביר את הנתונים מהמחשבון הישן?</div>
+    <p style="font-size:14px;color:var(--muted)">כבר יש נתונים באפליקציה. אם תעביר, מה שיש כאן יוחלף בנתונים מהקישור הישן.</p>
+    <div class="nav" style="margin-top:14px"><button class="btn ghost" onclick="closeSheet()">השאר מה שיש</button><button class="btn primary" id="impYes">העבר</button></div></div></div>`;
+  $("impYes").onclick=apply;
+})();
 </script>
 </body>
 </html>

@@ -1,6 +1,6 @@
 // מחשבון קלוריות – יקי אוזן | service worker
 // כל עדכון: להעלות את המספר כדי שהמשתמשים יקבלו את הגרסה החדשה
-const VERSION = "v2";
+const VERSION = "v3";
 const CACHE = "yu-cal-" + VERSION;
 const SHELL = ["./", "index.html", "manifest.webmanifest",
   "icons/icon-192.png", "icons/icon-512.png", "icons/maskable-512.png", "icons/apple-touch-icon.png"];
