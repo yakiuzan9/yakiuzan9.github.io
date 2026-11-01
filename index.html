@@ -425,6 +425,16 @@ const FOODS = [
 ["חטיף חלבון",340,33,30,9,"חטיף",60],["חטיף דגנים",400,6,70,11,"חטיף",25],["מרק עוף",30,3,2,1,"קערה",300],
 ["קטשופ",112,1.3,26,0.2,"כף",17],["קוקה קולה",42,0,10.6,0,"פחית",330],["מיץ תפוזים",45,0.7,10.4,0.2,"כוס",240],
 ["בירה",43,0.5,3.6,0,"בקבוק",330],["יין (אדום / לבן)",83,0.1,2.6,0,"כוס",150],
+// ===== תוספות מהבדיקה =====
+["קלמנטינה",47,0.8,12,0.3,"יחידה",75],["רימון (גרגרים)",83,1.7,19,1.2,"רימון",170],["אננס",50,0.5,13,0.1],["שזיף",46,0.7,11,0.3,"יחידה",65],
+["אשכולית",42,0.8,11,0.1,"חצי",120],["דובדבנים",63,1,16,0.2],["גויאבה",68,2.6,14,1,"יחידה",55],["פפאיה",43,0.5,11,0.3],
+["תרד",23,2.9,3.6,0.4],["דלעת",26,1,6.5,0.1],["בצל",40,1.1,9,0.1,"יחידה",110],["סלק",43,1.6,10,0.2],["כוסמת מבושלת",92,3.4,20,0.6,"כוס",170],
+["צפתית 5%",105,14,1.5,5],["קשקבל",380,25,1,30,"פרוסה",20],["ריקוטה 5%",110,10,3.5,5,"כף",30],["פרמזן",431,38,4,29,"כף",5],
+["שמנת מתוקה 32%",300,2,3,32,"כף",15],["שמנת חמוצה 15%",160,3,4,15,"כף",20],["מרגרינה",717,0,0.7,80,"כף",14],
+["מעדן / פודינג חלבון",80,10,6,1.5,"גביע",200],["מעדן שוקולד (כמו דני)",125,3.5,19,4,"גביע",125],
+["פיסטוק",560,20,28,45,"חופן",30],["סרדינים בשמן (מסוננים)",208,25,0,11.5,"קופסה",90],
+["פנקייק",227,6.4,28,10,"יחידה",50],["וופל בלגי",310,7,40,14,"יחידה",75],
+["דייסת שיבולת שועל (במים)",71,2.5,12,1.5,"קערה",300],["דייסת שיבולת שועל (בחלב 3%)",115,5,16,3.5,"קערה",300],
 // ===== בסיס למנות רחוב =====
 ["שווארמה הודו (בשר בלבד)",200,22,2,12],["שווארמה בקר/כבש (בשר בלבד)",260,20,2,19],["מעורב ירושלמי (בשר בלבד)",230,22,1,15],
 ["קבב",260,17,4,20,"קבב",60],["חציל מטוגן",230,1.5,9,21],["עמבה",80,0.5,15,2.5,"כף",15],["חמוצים",15,0.5,2,0.2],
@@ -482,9 +492,18 @@ const COMBOS=[
  ["🥣 מנת חומוס במסעדה (בלי פיתה)",[["סלט חומוס",250],["חומוס (גרגרים מבושלים)",30],["שמן זית",10]]],
  ["🍗 נאגטס (8 יח׳) עם צ'יפס",[["נאגטס עוף",144],["צ'יפס",150],["קטשופ",20]]]
 ];
-COMBOS.forEach(([name,parts])=>{let g=0,k=0,p=0,c=0,f=0;
-  parts.forEach(([n,gr])=>{const b=FOODS.find(x=>x.n===n);if(!b){console.warn("missing",n);return}g+=gr;k+=b.k*gr/100;p+=b.p*gr/100;c+=b.c*gr/100;f+=b.f*gr/100});
-  const r=x=>Math.round(x/g*1000)/10;FOODS.unshift({n:name,k:Math.round(k/g*100),p:r(p),c:r(c),f:r(f),u:"מנה",ug:g,combo:true})});
+/* סיבים תזונתיים ל-100 ג׳ (ערכים מקובלים) */
+const FIB=[["לחם מלא",6],["לחם קל",7],["לחם דגנים",6],["לחם שיפון",6],["לחמנייה מקמח מלא",6],["לחמניית דגנים",6],["לחם לבן",2.7],["לחמנייה רגילה",2.5],["לחמניית המבורגר",2.3],["פיתה",2.2],["לאפה",2.5],["טורטייה",3],["חלה",2],["באגט",2.4],["בייגל",2.5],
+ ["דייסת שיבולת",1.7],["שיבולת שועל",10],["גרנולה",7],["קורנפלקס",3],["אורז מלא",1.8],["אורז",0.4],["פסטה",1.8],["קינואה",2.8],["בורגול",4.5],["כוסמת",2.7],["קוסקוס",1.4],["פתיתים",1.5],["תפוח אדמה",1.8],["בטטה",3.3],["פירה",1.5],
+ ["עדשים",7.9],["שעועית",6.3],["חומוס (גרגרים",7.6],["סלט חומוס",5],["פלאפל",4],["אפונה",5],["תירס",2.4],["מג'דרה",4],["מרק עדשים",3],["מרק ירקות",1.5],
+ ["בננה",2.6],["תפוח",2.4],["תפוז",2.4],["קלמנטינה",1.7],["אגס",3.1],["תותים",2],["קיווי",3],["אוכמניות",2.4],["מנגו",1.6],["תמר",6.7],["ענבים",0.9],["אפרסק",1.5],["אבטיח",0.4],["מלון",0.9],["רימון",4],["אננס",1.4],["שזיף",1.4],["אשכולית",1.6],["דובדבנים",2.1],["גויאבה",5.4],["פפאיה",1.7],["צימוקים",3.7],
+ ["מלפפון",0.5],["עגבני",1.2],["סלט ירקות",1.5],["סלט ישראלי",1.5],["גזר",2.8],["פלפל",2.1],["ברוקולי",2.6],["חסה",1.3],["כרובית",2],["קישוא",1],["חציל",2.5],["פטריות",1],["כרוב",2.5],["קולסלו",1.8],["תרד",2.2],["דלעת",0.5],["בצל",1.7],["סלק",2.8],["מטבוחה",1.5],
+ ["אבוקדו",6.7],["שקדים",12.5],["אגוזי מלך",6.7],["בוטנים",8.5],["קשיו",3.3],["פיסטוק",10],["חמאת בוטנים",6],["גרעינים",8.6],["טחינה גולמית",9.3],["טחינה מוכנה",4],["חלבה",4.5],
+ ["פריכיות",3.4],["קרקרים",6],["צ'יפס",3.8],["תפוצ'יפס",4],["דוריטוס",4],["פופקורן",10],["בייגלה",3],["שוקולד מריר",11],["שוקולד חלב",3],["חטיף דגנים",4],["חטיף חלבון",5],["ממולאים",1.5],["עלי גפן",3],["מקלובה",2],["חמין",3],["קובה",1.5]];
+FOODS.forEach(f=>{const m=FIB.find(([n])=>f.n.includes(n));f.fb=m?m[1]:0});
+COMBOS.forEach(([name,parts])=>{let g=0,k=0,p=0,c=0,f=0,fb=0;
+  parts.forEach(([n,gr])=>{const b=FOODS.find(x=>x.n===n);if(!b){console.warn("missing",n);return}g+=gr;k+=b.k*gr/100;p+=b.p*gr/100;c+=b.c*gr/100;f+=b.f*gr/100;fb+=b.fb*gr/100});
+  const r=x=>Math.round(x/g*1000)/10;FOODS.unshift({n:name,k:Math.round(k/g*100),p:r(p),c:r(c),f:r(f),fb:r(fb),u:"מנה",ug:g,combo:true})});
 
 /* ===== חיפוש חכם ===== */
 const norm=s=>String(s).toLowerCase().replace(/['"״׳`\-–()]/g,"").replace(/ך/g,"כ").replace(/ם/g,"מ").replace(/ן/g,"נ").replace(/ף/g,"פ").replace(/ץ/g,"צ").replace(/יי/g,"י").replace(/וו/g,"ו").replace(/\s+/g," ").trim();
@@ -667,6 +686,16 @@ function go(n){
   if(n===4){lastR=calc();renderRes(lastR);exSel=null;renderExamples();track("calc")}
   show(n);
 }
+function fiberTarget(kcal){return Math.max(25,Math.round(kcal/1000*14))}
+function macroSplit(kcal,w,hm,g,lifts){
+  const bmi=w/(hm*hm),protW=bmi>30?27*hm*hm:w;
+  const ppk=lifts?{cut:2.2,recomp:2.2,maintain:1.8,bulk:1.8}[g]:{cut:1.8,recomp:1.8,maintain:1.6,bulk:1.6}[g];
+  let P=Math.min(Math.round(protW*ppk),250);
+  let F=Math.round(Math.max(kcal*.25/9,0.6*w));
+  let C=Math.round((kcal-P*4-F*9)/4);
+  if(C<60){F=Math.round(Math.max(kcal*.2/9,0.5*w));C=Math.max(0,Math.round((kcal-P*4-F*9)/4))}
+  return{P,C,F};
+}
 function calc(){
   const sex=state.sex,a=v("age"),h=v("height"),w=v("weight"),hm=h/100,bmi=w/(hm*hm);
   const bmr=10*w+6.25*h-5*a+(sex==="m"?5:-161);
@@ -683,6 +712,7 @@ function calc(){
   else if(g==="bulk"){let sur=w*PACE.bulk[state.pace]*7700/7;if(sur>tdee*.2){sur=tdee*.2;rateCapped=true}kcal=tdee+sur;rateKg=sur*7/7700}
   else if(g==="recomp")kcal=tdee*.92;
   kcal=Math.round(kcal/10)*10;
+  const _m=macroSplit(kcal,w,hm,g,lifts);
   const protW=bmi>30?27*hm*hm:w;
   const ppk=lifts?{cut:2.2,recomp:2.2,maintain:1.8,bulk:1.8}[g]:{cut:1.8,recomp:1.8,maintain:1.6,bulk:1.6}[g];
   let P=Math.min(Math.round(protW*ppk),250);
@@ -770,6 +800,7 @@ function renderRes(R){
    EXAMPLE MEALS (solver)
    ===================================================================== */
 const MF={ // per 100g: kcal,p,c,f, unit, unitGrams, max
+ "אבקת חלבון":[380,78,8,5,"סקופ",30,60],
  "חזה עוף":[165,31,0,3.6,null,null,350],"חזה הודו":[135,30,0,1,null,null,350],"פרגית":[210,26,0,11,null,null,300],
  "סלמון":[208,20,0,13,null,null,250],"אמנון":[128,26,0,2.7,null,null,350],"טונה במים":[116,26,0,1,"קופסה",112,250],
  "בקר טחון 5%":[137,21,0,5,null,null,300],"ביצים":[143,12.6,0.7,9.5,"ביצה",55,250],"חלבוני ביצה":[52,11,0.7,0.2,"חלבון",33,300],
@@ -788,7 +819,7 @@ const MF={ // per 100g: kcal,p,c,f, unit, unitGrams, max
 const MTYPES={3:["b","l","d"],4:["b","l","s","d"],5:["b","s","l","s","d"],6:["b","s","l","s","d","n"]};
 const MSHARE={b:1,l:1.15,d:1,s:0.6,n:0.5};
 const MTPL={
- b:[["חלבוני ביצה","לחם מלא","אבוקדו",[["ביצים",110],["מלפפון ועגבנייה",150]]],["קוטג' 5%","לחם מלא","טחינה גולמית",["סלט ירקות",150]],
+ b:[["חלבוני ביצה","לחם מלא","אבוקדו",[["ביצים",110],["מלפפון ועגבנייה",150]]],["אבקת חלבון","שיבולת שועל","חמאת בוטנים",["בננה",60],0,"🥣 דייסה במיקרוגל: שיבולת שועל + מים או חלב, 2 דקות, ואז מערבבים אבקת חלבון"],["קוטג' 5%","לחם מלא","טחינה גולמית",["סלט ירקות",150]],
     ["יוגורט חלבון","שיבולת שועל","שקדים",["אוכמניות",80]],["גבינה לבנה 5%","פיתה","שמן זית",["סלט ירקות",150]]],
  l:[["חזה עוף","אורז לבן (מבושל)","שמן זית",["סלט ירקות",200]],["חזה הודו","בטטה","טחינה גולמית",["ברוקולי",150]],
     ["סלמון","קינואה (מבושלת)","שמן זית",["סלט ירקות",200]],["פרגית","פסטה (מבושלת)","שמן זית",["קישואים",150]],
@@ -818,18 +849,25 @@ function buildMeal(ty,idx,t,tot){
   const g=msolve([o[0],o[1],o[2]],tg);
   const items=[[o[0],g[0]],[o[1],g[1]],[o[2],g[2]],...fixed].filter(x=>x[1]>0);
   const m={k:0,p:0,c:0,f:0};items.forEach(([n,gr])=>{const a=MF[n],q=gr/100;m.k+=a[0]*q;m.p+=a[1]*q;m.c+=a[2]*q;m.f+=a[3]*q});
-  return{items,m};
+  return{items,m,note:o[5]||""};
 }
 let exSel=null;
 function renderExamples(){
   const R=lastR,el=$("exMeals");if(!R||!el)return;
   const types=MTYPES[R.meals],tot=types.reduce((s,t)=>s+MSHARE[t],0),names=MEALNAMES[R.meals];
   if(!exSel){const used={};exSel=types.map(t=>(used[t]=(used[t]??-1)+1))}
-  el.innerHTML=types.map((ty,i)=>{const {items,m}=buildMeal(ty,exSel[i],R,tot);
+  const prep={};
+  el.innerHTML=types.map((ty,i)=>{const {items,m,note}=buildMeal(ty,exSel[i],R,tot);
+    if(ty==="l"||ty==="d")items.forEach(([n,g])=>{if(!/סלט|מלפפון|ברוקולי|קישואים|שמן זית|טחינה|אבוקדו|לחם|פיתה|טורטייה/.test(n))prep[n]=(prep[n]||0)+g});
     return`<div class="box" style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
       <b style="font-size:15px">${names[i]}</b><button class="btn ghost sm" style="flex:0 0 auto" onclick="exSel[${i}]++;renderExamples()">🔄 החלף</button></div>
       ${items.map(([n,g])=>`<div style="display:flex;justify-content:space-between;font-size:14px;padding:4px 0;border-top:1px solid var(--line)"><span>${n}<small style="color:var(--muted)">${mUnit(n,g)}</small></span><b>${g} ג׳</b></div>`).join("")}
-      <div class="note" style="margin-top:6px">${fmt(m.k)} קק״ל · <span class="tp">ח ${Math.round(m.p)}</span> · <span class="tc">פ ${Math.round(m.c)}</span> · <span class="tf">ש ${Math.round(m.f)}</span></div></div>`}).join("");
+      ${note?`<div class="note" style="margin-top:6px">${note}</div>`:""}
+      <div class="note" style="margin-top:6px">${fmt(m.k)} קק״ל · <span class="tp">ח ${Math.round(m.p)}</span> · <span class="tc">פ ${Math.round(m.c)}</span> · <span class="tf">ש ${Math.round(m.f)}</span></div></div>`}).join("")
+    +(Object.keys(prep).length?`<div class="box" style="border-color:#4fc3ff55"><b style="font-size:15px">📦 בישול מראש ל-3 ימים</b>
+      <p class="note" style="margin:4px 0 8px">לפי ארוחות הצהריים והערב שלמעלה. מבשלים פעם אחת, מחלקים לקופסאות, וחוסכים זמן במשמרות.</p>
+      ${Object.entries(prep).map(([n,g])=>`<div style="display:flex;justify-content:space-between;font-size:14px;padding:4px 0;border-top:1px solid var(--line)"><span>${n}</span><b>${fmt(g*3)} ג׳ <small style="color:var(--muted)">(מבושל)</small></b></div>`).join("")}
+      <p class="note" style="margin-top:6px">💡 עוף ובשר מתכווצים בבישול בערך ב-25%, אז קונים בערך פי 1.3 נא. אורז ופסטה מכפילים פי 2.5–3 את המשקל, אז מבשלים בערך שליש מהמשקל יבש.</p></div>`:"");
 }
 
 /* =====================================================================
@@ -878,7 +916,7 @@ function startTracking(){
   const prev=D.plan;
   D.plan={kcal:R.kcal,P:R.P,C:R.C,F:R.F,meals:R.meals,goal:R.g,water:R.water,sex:R.sex,age:R.age,height:R.height,weight:R.w,
     name:$("uname").value.trim().slice(0,20),wk:[...new Set(state.workouts.map(x=>x.t))],target:(R.g==="cut"||R.g==="bulk")&&R.t?R.t:null,
-    startWeight:prev?.startWeight||R.w,startDate:prev?.startDate||today(),created:Date.now()};
+    startWeight:prev?.startWeight||R.w,startDate:prev?.startDate||today(),created:Date.now(),tdee:Math.round(R.tdee),lifts:R.lifts,calibrated:prev?.calibrated||null};
   const tk=today();if(!getDay(tk).weight){getDay(tk).weight=R.w}
   const t=today();const day=getDay(t);day.target=planTarget();persist();
   logDate=t;setView("log");track("start-tracking");
@@ -892,8 +930,9 @@ function getDay(k){if(!D.days[k])D.days[k]={items:[],water:0,steps:null,weight:n
 function deadline(k){const d=kdate(addDays(k,1));d.setHours(LATE_HOUR,0,0,0);return d.getTime()}
 const isLate=(k,it)=>it.ts>deadline(k);
 function totals(k,onlyOnTime){
-  const day=D.days[k];const t={kcal:0,P:0,C:0,F:0};if(!day)return t;
-  day.items.forEach(it=>{if(onlyOnTime&&isLate(k,it))return;const m=it.g/100;t.kcal+=it.k*m;t.P+=it.p*m;t.C+=it.c*m;t.F+=it.f*m});
+  const day=D.days[k];const t={kcal:0,P:0,C:0,F:0,FB:0};if(!day)return t;
+  day.items.forEach(it=>{if(onlyOnTime&&isLate(k,it))return;const m=it.g/100;t.kcal+=it.k*m;t.P+=it.p*m;t.C+=it.c*m;t.F+=it.f*m;
+    let fb=it.fb;if(fb==null){const x=FIB.find(([n])=>it.n.includes(n));fb=x?x[1]:0}t.FB+=fb*m});
   return t;
 }
 function dayStatus(k){
@@ -932,7 +971,7 @@ function renderLog(){
   const k=logDate,day=getDay(k);
   if(!day.target)day.target=planTarget();
   const T=day.target,t=totals(k,false),rem=T.kcal-t.kcal;
-  const nm=MEALNAMES[T.meals]||MEALNAMES[4];
+  const nm=mealNames(k);
   const st=streakInfo();
   const bar=(lbl,val,tg,col)=>{const pc=Math.min(100,val/tg*100);const over=val>tg*1.1;
     return`<div class="mbar"><span>${lbl}</span><div class="track"><div class="fill" style="width:${pc}%;background:${over?"var(--warn)":col}"></div></div><b><em>${Math.round(val)}</em> / ${tg}</b></div>`};
@@ -941,6 +980,7 @@ function renderLog(){
     const mk=its.reduce((s,o)=>s+o.it.k*o.it.g/100,0);
     return`<div class="card meal"><div class="meal-h"><b>${name}</b><span>${fmt(mk)} קק״ל</span></div>
       ${its.map(o=>`<div class="item" onclick="openSheet(${mi},${o.ix})"><div class="nm">${esc(o.it.n)}${isLate(k,o.it)?'<span class="late">נרשם באיחור</span>':''}<small>${o.it.g} ג׳ · ח ${(o.it.p*o.it.g/100).toFixed(0)} · פ ${(o.it.c*o.it.g/100).toFixed(0)} · ש ${(o.it.f*o.it.g/100).toFixed(0)}</small></div><span class="kc">${fmt(o.it.k*o.it.g/100)}</span><button class="x" onclick="event.stopPropagation();delItem(${o.ix})">✕</button></div>`).join("")}
+      ${!its.length&&yItems(k,mi).length?`<button class="savebtn" style="width:100%;margin-top:8px" onclick="copyYesterday(${mi})">↩️ כמו אתמול: ${yItems(k,mi).slice(0,3).map(x=>esc(x.n.replace(/\s*\(.*?\)/g,""))).join(", ")}${yItems(k,mi).length>3?"…":""} (${fmt(yItems(k,mi).reduce((s,x)=>s+x.k*x.g/100,0))} קק״ל)</button>`:""}
       <div class="meal-a"><button class="addbtn" onclick="openSheet(${mi})">+ הוסף מאכל</button>${its.length?`<button class="savebtn" onclick="saveTplDlg(${mi})">⭐ שמור כקבועה</button>`:""}</div></div>`;
   }).join("");
   const cups=Math.max(8,Math.ceil((T.water||2.5)/0.25));
@@ -952,14 +992,19 @@ function renderLog(){
     <div class="d"><b>${niceDate(k)}</b><span>${kdate(k).toLocaleDateString("he-IL")}</span></div>
     <button onclick="moveDay(-1)">‹</button>
   </div>
+  <div class="trained" style="margin:-4px 0 12px;justify-content:center">${Object.entries(SHIFTS).map(([key,[lbl]])=>`<button class="${(day.shift||"regular")===key?"on":""}" onclick="setShift('${key}')">${lbl}</button>`).join("")}</div>
+  ${day.shift&&day.shift!=="regular"?`<div class="alert i" style="margin-top:-4px">${SHIFTS[day.shift][2]}</div>`:""}
   <div class="card">
     <div class="remain">
       <div><div class="rl">${rem>=0?"נשארו לך":"עברת ב-"}</div><div class="rv" style="color:${rem>=0?"var(--accent)":"var(--warn)"}">${fmt(Math.abs(rem))}</div><div class="rl">קק״ל מתוך ${fmt(T.kcal)}</div></div>
       <span class="streakchip" onclick="setView('prog')">🔥 רצף ${Math.min(st.n,STREAK_GOAL)}/${STREAK_GOAL}</span>
     </div>
-    <div class="mbars">${bar("קלוריות",t.kcal,T.kcal,"var(--accent)")}${bar("חלבון",t.P,T.P,"var(--p)")}${bar("פחמימה",t.C,T.C,"var(--c)")}${bar("שומן",t.F,T.F,"var(--f)")}</div>
+    <div class="mbars">${bar("קלוריות",t.kcal,T.kcal,"var(--accent)")}${bar("חלבון",t.P,T.P,"var(--p)")}${bar("פחמימה",t.C,T.C,"var(--c)")}${bar("שומן",t.F,T.F,"var(--f)")}${bar("סיבים",t.FB,fiberTarget(T.kcal),"#b48cff")}</div>
   </div>
   ${statusLine}
+  ${!day.items.length&&(D.days[addDays(k,-1)]?.items||[]).length?`<button class="savebtn" style="width:100%;margin-bottom:14px;padding:13px" onclick="copyYesterday()">↩️ להעתיק את כל אתמול (${fmt(totals(addDays(k,-1),false).kcal)} קק״ל) ולערוך</button>`:""}
+  ${backupNag()}
+  ${retargetCard()}
   ${k===today()?suggestion(k):""}
   ${meals}
   <div class="card">
@@ -1038,6 +1083,81 @@ function trainedChips(day){
 }
 function toggleTrained(t){const d=getDay(logDate);d.trained=d.trained||[];const i=d.trained.indexOf(t);if(i>=0)d.trained.splice(i,1);else d.trained.push(t);persist();$("trainedBox").innerHTML=trainedChips(d)}
 WK.other=["➕ אחר",4];
+const SHIFTS={
+ regular:["☀️ יום רגיל",null,""],
+ morning:["🌅 משמרת בוקר",["משהו קטן לפני היציאה","במשמרת – ארוחת בוקר","במשמרת – צהריים","אחרי המשמרת","ארוחת ערב","לפני שינה"],"משמרת בוקר: אוכלים משהו קטן לפני היציאה (יוגורט חלבון / פרי), ואת ארוחת הבוקר האמיתית בהפסקה הראשונה. מכינים קופסה מאתמול."],
+ evening:["🌆 משמרת ערב",["ארוחת בוקר","צהריים לפני המשמרת","במשמרת","במשמרת – ערב","אחרי המשמרת","לפני שינה"],"משמרת ערב: ארוחת צהריים גדולה לפני היציאה, ובמשמרת קופסה מוכנה. אחרי המשמרת – משהו קל וחלבוני, לא ארוחה כבדה לפני שינה."],
+ night:["🌙 משמרת לילה",["ארוחה כשקמים","לפני המשמרת","במשמרת","במשמרת – אמצע הלילה","אחרי המשמרת","לפני שינה"],"משמרת לילה: הארוחה הגדולה לפני המשמרת. במשמרת ארוחות קטנות ועשירות בחלבון כדי לא להירדם, ופחות פחמימות פשוטות אחרי 2 בלילה. אחרי המשמרת משהו קל ולישון."]
+};
+const SHIFT_IDX={3:[1,2,4],4:[0,1,2,4],5:[0,1,2,3,4],6:[0,1,2,3,4,5]};
+function mealNames(k){const day=D.days[k],n=(day?.target?.meals)||D.plan.meals||4,s=day?.shift;
+  if(!s||s==="regular")return MEALNAMES[n]||MEALNAMES[4];return SHIFT_IDX[n].map(i=>SHIFTS[s][1][i])}
+function setShift(key){const d=getDay(logDate);d.shift=key;D.lastShift=key;persist();renderLog()}
+function backupNag(){
+  const logged=Object.values(D.days).filter(d=>d.items&&d.items.length).length;if(logged<3)return"";
+  const now=Date.now(),last=Math.max(D.lastBackup||0,D.backupSnooze||0,D.plan?.created||0);
+  if(now-last<7*864e5)return"";
+  return`<div class="alert i" style="display:flex;gap:10px;align-items:center;justify-content:space-between"><span>💾 עבר שבוע בלי גיבוי. אם הטלפון ילך לאיבוד, הכול נמחק.</span>
+    <span style="display:flex;gap:6px;flex:0 0 auto"><button class="btn primary sm" onclick="backupDlg()">גבה</button><button class="btn ghost sm" style="flex:0 0 auto" onclick="D.backupSnooze=Date.now();persist();renderLog()">אחר כך</button></span></div>`;
+}
+function avgW(fromK,toK){const ws=Object.keys(D.days).filter(k=>k>=fromK&&k<=toK&&D.days[k].weight).map(k=>D.days[k].weight);return ws.length?{a:ws.reduce((s,x)=>s+x,0)/ws.length,n:ws.length}:null}
+function retargetCard(){
+  const p=D.plan;if(!p||!D.form||!D.form.job)return"";
+  const ks=Object.keys(D.days).filter(k=>D.days[k].weight).sort().slice(-7);if(ks.length<3)return"";
+  const cur=ks.reduce((s,k)=>s+D.days[k].weight,0)/ks.length,diff=cur-p.weight;
+  if(Math.abs(diff)<2)return"";
+  if(D.retargetSnooze&&Date.now()-D.retargetSnooze<5*864e5)return"";
+  return`<div class="card" style="border-color:#4fc3ff66"><div class="sec-title">⚖️ המשקל השתנה – כדאי לעדכן יעד</div>
+    <p style="font-size:14px">${diff<0?"ירדת":"עלית"} ${Math.abs(diff).toFixed(1)} ק״ג מאז שחישבת (${p.weight} ← ${cur.toFixed(1)} בממוצע). ${diff<0?"גוף קל יותר שורף פחות, ובלי עדכון הירידה תאט.":"גוף כבד יותר שורף יותר, אז היעד צריך לעלות."}</p>
+    <div class="nav" style="margin-top:10px"><button class="btn primary" onclick="retarget(${cur.toFixed(1)})">עדכן יעד</button><button class="btn ghost" style="flex:0 0 auto;padding:12px" onclick="D.retargetSnooze=Date.now();persist();renderLog()">לא עכשיו</button></div></div>`;
+}
+function retarget(w){
+  loadForm();$("weight").value=w;
+  const R=calc();const p=D.plan,old=p.kcal;
+  Object.assign(p,{kcal:R.kcal,P:R.P,C:R.C,F:R.F,water:R.water,weight:w,tdee:Math.round(R.tdee),lifts:R.lifts,calibrated:null});
+  D.form.weight=String(w);getDay(today()).target=planTarget();persist();track("retarget");renderLog();
+  $("overlay").innerHTML=`<div class="backdrop center" onclick="if(event.target===this)closeSheet()"><div class="modal"><div class="sec-title">✅ היעד עודכן</div>
+    <p style="font-size:15px">${fmt(old)} ← <b style="color:var(--accent)">${fmt(R.kcal)}</b> קק״ל ביום · חלבון ${R.P} ג׳</p><button class="btn primary full" style="margin-top:14px" onclick="closeSheet()">מעולה</button></div></div>`;
+}
+function calibration(){
+  const p=D.plan;if(!p||!p.tdee)return null;
+  const end=addDays(today(),-1),start=addDays(end,-20);
+  const days=[...Array(21)].map((_,i)=>addDays(start,i)).filter(k=>k>=(p.startDate||"0"));
+  if(days.length<14)return{wait:14-days.length};
+  const logged=days.filter(k=>(D.days[k]?.items||[]).length);
+  const w1=avgW(days[0],days[6]),w2=avgW(days[days.length-7],days[days.length-1]);
+  if(logged.length<10||!w1||!w2||w1.n<2||w2.n<2)return{need:true,logged:logged.length};
+  const span=days.length-7;
+  const intake=logged.reduce((s,k)=>s+totals(k,false).kcal,0)/logged.length;
+  const real=Math.round((intake-(w2.a-w1.a)*7700/span)/10)*10;
+  const bmr=p.tdee/1.4;
+  if(real<bmr*1.0||real>p.tdee*1.8)return{odd:true,real,intake};
+  return{real,est:p.tdee,intake:Math.round(intake),dw:w2.a-w1.a,span};
+}
+function applyCalibration(real){
+  const p=D.plan,delta=p.kcal-p.tdee;
+  let k=real+delta;const floor=Math.max(p.sex==="m"?1500:1200,Math.round(p.tdee/1.45));if(k<floor)k=floor;
+  k=Math.round(k/10)*10;const m=macroSplit(k,p.weight,p.height/100,p.goal,p.lifts!==false);
+  const old=p.kcal;Object.assign(p,{kcal:k,P:m.P,C:m.C,F:m.F,tdee:real,calibrated:today()});getDay(today()).target=planTarget();persist();track("calibrate");renderProg();
+  $("overlay").innerHTML=`<div class="backdrop center" onclick="if(event.target===this)closeSheet()"><div class="modal"><div class="sec-title">🎯 היעד כויל לפי הגוף שלך</div>
+    <p style="font-size:15px">${fmt(old)} ← <b style="color:var(--accent)">${fmt(k)}</b> קק״ל ביום</p><p class="note">אפשר לכייל שוב בעוד 3 שבועות.</p><button class="btn primary full" style="margin-top:14px" onclick="closeSheet()">מעולה</button></div></div>`;
+}
+function calibCard(){
+  const c=calibration();if(!c)return"";
+  const head=`<div class="card" style="border-color:#c6ff3d55"><div class="sec-title">🎯 כיול אישי</div>`;
+  if(D.plan.calibrated&&Date.now()-kdate(D.plan.calibrated)<21*864e5)return`${head}<p style="font-size:14px">היעד כויל ב-${shortDate(D.plan.calibrated)} לפי הנתונים שלך: הוצאה אמיתית ~${fmt(D.plan.tdee)} קק״ל. כיול הבא אפשרי בעוד ${Math.ceil(21-(Date.now()-kdate(D.plan.calibrated))/864e5)} ימים.</p></div>`;
+  if(c.wait)return`${head}<p style="font-size:14px">המחשבון נותן הערכה לפי נוסחה. אחרי 14 ימים של רישום ושקילות, הוא יחשב את ההוצאה <b>האמיתית</b> שלך לפי מה שאכלת ואיך המשקל זז. עוד ${c.wait} ימים.</p></div>`;
+  if(c.need)return`${head}<p style="font-size:14px">כדי לכייל צריך לפחות 10 ימים רשומים ו-2 שקילות בשבוע הראשון ובשבוע האחרון. כרגע: ${c.logged} ימים רשומים. ממשיכים לרשום ולשקול 💪</p></div>`;
+  if(c.odd)return`${head}<p style="font-size:14px">הנתונים יוצאים לא הגיוניים (אולי חסר רישום של חלק מהאוכל). אז נשארים עם הנוסחה בינתיים, וממשיכים לרשום הכול, כולל נשנושים ושתייה.</p></div>`;
+  const d=c.real-c.est;
+  return`${head}<p style="font-size:14px">לפי ${c.span+7} ימים: אכלת בממוצע <b>${fmt(c.intake)}</b> קק״ל, והמשקל ${c.dw<0?"ירד":"עלה"} ב-${Math.abs(c.dw).toFixed(1)} ק״ג.</p>
+    <div class="duo" style="margin:12px 0"><div class="mini"><div class="l">הערכת המחשבון</div><div class="v" style="font-size:22px">${fmt(c.est)}</div></div><div class="mini"><div class="l">ההוצאה האמיתית שלך</div><div class="v" style="font-size:22px;color:var(--accent)">${fmt(c.real)}</div></div></div>
+    ${Math.abs(d)<100?`<p class="note">הנוסחה פגעה בול. אין צורך לשנות 👌</p>`:`<button class="btn primary full" onclick="applyCalibration(${c.real})">עדכן את היעד לפי ההוצאה האמיתית</button><p class="note">הכיול מדויק רק אם רשמת את כל מה שאכלת. רישום חסר = הוצאה שנראית נמוכה מדי.</p>`}</div>`;
+}
+function yItems(k,mi){const y=D.days[addDays(k,-1)];return y?y.items.filter(x=>x.meal===mi):[]}
+function copyYesterday(mi){const day=getDay(logDate),now=Date.now();
+  const src=mi==null?(D.days[addDays(logDate,-1)]?.items||[]):yItems(logDate,mi);
+  src.forEach(x=>day.items.push({...x,ts:now}));persist();afterChange()}
 function moveDay(n){const nk=addDays(logDate,n);if(nk>today())return;logDate=nk;renderLog()}
 function water(n){const d=getDay(logDate);d.water=Math.max(0,Math.min(30,d.water+n));persist();renderLog()}
 function delItem(ix){getDay(logDate).items.splice(ix,1);persist();afterChange()}
@@ -1052,7 +1172,7 @@ function openSheet(meal,editIx){
 }
 function closeSheet(){sh=null;$("overlay").innerHTML=""}
 function drawSheet(){
-  const nm=(MEALNAMES[getDay(logDate).target.meals]||MEALNAMES[4])[sh.meal];
+  const nm=mealNames(logDate)[sh.meal];
   let body="";
   if(sh.sel){
     const f=sh.sel,m=sh.g/100;
@@ -1147,13 +1267,13 @@ function commitItem(){
   const g=Math.round(sh.g);if(!(g>0&&g<=3000)){$("gIn").style.borderColor="var(--warn)";return}
   const day=getDay(logDate),f=sh.sel;
   if(sh.editIx!=null){day.items[sh.editIx].g=g}
-  else day.items.push({n:f.n,k:f.k,p:f.p,c:f.c,f:f.f,u:f.u,ug:f.ug,g,meal:sh.meal,ts:Date.now()});
+  else day.items.push({n:f.n,k:f.k,p:f.p,c:f.c,f:f.f,fb:f.fb||0,u:f.u,ug:f.ug,g,meal:sh.meal,ts:Date.now()});
   persist();closeSheet();afterChange();
 }
 function addTpl(i){const day=getDay(logDate),now=Date.now();D.tpl[i].items.forEach(x=>day.items.push({...x,meal:sh.meal,ts:now}));persist();closeSheet();afterChange()}
 function delTpl(i){D.tpl.splice(i,1);persist();drawSheet()}
 function saveTplDlg(mi){
-  const nm=(MEALNAMES[getDay(logDate).target.meals]||MEALNAMES[4])[mi];
+  const nm=mealNames(logDate)[mi];
   $("overlay").innerHTML=`<div class="backdrop center" onclick="if(event.target===this)closeSheet()"><div class="modal">
     <div class="sec-title">⭐ שמירת ארוחה קבועה</div>
     <input class="txt" id="tplName" placeholder="למשל: הבוקר הקבוע שלי" value="${esc(nm)}" maxlength="40">
@@ -1211,7 +1331,8 @@ function renderProg(){
     <div class="dots">${dots}</div>
     ${winBox}
   </div>
-  <div class="card"><div class="sec-title">⚖️ משקל, 30 יום</div>${wsvg}</div>
+  ${calibCard()}
+  <div class="card"><div class="sec-title">⚖️ משקל, 30 יום</div>${wsvg}${D.plan.sex==="f"?`<p class="note">💡 אצל נשים המשקל יכול לקפוץ ב-1–2 ק״ג בימים שלפני המחזור ובמהלכו, בגלל אגירת נוזלים. זה לא שומן. מסתכלים על הממוצע לאורך החודש.</p>`:""}</div>
   <div class="card"><div class="sec-title">📊 ממוצע שבועי</div>${wkHtml}</div>
   <div class="card"><div class="sec-title">📅 היסטוריה</div><div class="hist">${hist}</div>
     <p class="note">✅ בטווח · ✖️ מחוץ לטווח · ⏱ נרשם באיחור · ⏳ היום, עדיין בתהליך. לוחצים על יום כדי לפתוח אותו ביומן.</p></div>
@@ -1334,6 +1455,7 @@ async function backupDlg(){
     <textarea id="bk" class="txt" style="height:120px;font-size:11px;direction:ltr;text-align:left" readonly>${code}</textarea>
     <div class="nav" style="margin-top:12px"><button class="btn primary" id="bkCopy">📋 העתק קוד</button>${inFrame?"":`<button class="btn ghost" style="flex:1" id="bkFile">⬇️ קובץ</button>`}</div>
     <button class="btn ghost full" style="margin-top:10px;border:0;color:var(--muted)" onclick="closeSheet()">סגור</button></div></div>`;
+  D.lastBackup=Date.now();persist();
   $("bkCopy").onclick=async e=>{try{await navigator.clipboard.writeText(code);e.target.textContent="✅ הועתק"}catch(_){$("bk").select();e.target.textContent="סמן והעתק"}};
   if($("bkFile"))$("bkFile").onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([code],{type:"text/plain"}));a.download=`גיבוי-קלוריות-${today()}.txt`;a.click()};
 }
