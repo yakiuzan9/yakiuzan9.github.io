@@ -214,6 +214,13 @@ svg text{font-family:inherit}
 .me .goalrow{display:flex;justify-content:space-between;align-items:baseline;margin:14px 0 6px;font-size:14px}
 .me .goalrow b{font-size:20px;color:var(--accent)}
 .me .quote{margin-top:12px;font-size:14px;padding:10px 12px;border-radius:12px;background:#ffffff08;border-right:3px solid var(--accent)}
+.wko{min-width:0;overflow:hidden;background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px}
+.wko-top{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+.wko select{flex:1 1 0;min-width:0;width:100%;background:var(--card);border:1.5px solid var(--line);color:var(--text);border-radius:12px;padding:11px 10px;font:inherit;font-size:15px;font-weight:700;outline:none}
+.wko select:focus{border-color:var(--accent)}
+.trained{display:flex;flex-wrap:wrap;gap:6px}
+.trained button{padding:8px 12px;border-radius:99px;border:1.5px solid var(--line);background:var(--card2);font-size:13px;font-weight:700;cursor:pointer}
+.trained button.on{border-color:var(--accent);color:var(--accent);background:#c6ff3d14}
 .modal{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px;width:calc(100% - 32px);max-width:420px;margin:auto}
 .backdrop.center{align-items:center}
 </style>
@@ -279,24 +286,10 @@ svg text{font-family:inherit}
         <label class="lbl">צעדים ביום <small>(הממוצע השבועי מאפליקציית הבריאות בטלפון)</small></label>
         <div class="num"><input id="stepsAvg" type="number" inputmode="numeric" placeholder="7000"><span class="unit">צעדים</span></div>
       </div>
-      <div class="box">
-        <div class="box-title">🏋️ אימוני כוח</div>
-        <div class="row2">
-          <div class="num"><span class="cap">אימונים בשבוע</span><input id="sSess" type="number" inputmode="numeric" placeholder="0"><span class="unit">פעמים</span></div>
-          <div class="num"><span class="cap">משך אימון</span><input id="sMin" type="number" inputmode="numeric" placeholder="60"><span class="unit">דק׳</span></div>
-        </div>
-      </div>
-      <div class="box">
-        <div class="box-title">🏃 אירובי / ספורט</div>
-        <div class="row2" style="margin-bottom:10px">
-          <div class="num"><span class="cap">אימונים בשבוע</span><input id="cSess" type="number" inputmode="numeric" placeholder="0"><span class="unit">פעמים</span></div>
-          <div class="num"><span class="cap">משך אימון</span><input id="cMin" type="number" inputmode="numeric" placeholder="30"><span class="unit">דק׳</span></div>
-        </div>
-        <div class="chips c3" data-k="cInt">
-          <button class="chip" data-v="light">קל<small>הליכה מהירה</small></button>
-          <button class="chip" data-v="mod">בינוני<small>ריצה, אופניים</small></button>
-          <button class="chip" data-v="hard">עצים<small>HIIT, כדורגל</small></button>
-        </div>
+      <div class="field">
+        <label class="lbl">אימונים קבועים בשבוע <small>(אפשר כמה סוגים, ואפשר גם בלי)</small></label>
+        <div id="wkList"></div>
+        <button class="addbtn" style="width:100%;margin-top:4px" onclick="addWk()">+ הוסף אימון</button>
       </div>
       <div class="err" id="e2"></div>
     </div>
@@ -578,10 +571,35 @@ function setView(v){
 /* =====================================================================
    CALCULATOR
    ===================================================================== */
-const state={sex:null,job:null,cInt:"mod",goal:null,pace:"mod",meals:"4"};
-const numIds=["uname","age","height","weight","stepsAvg","sSess","sMin","cSess","cMin","target"];
-function saveForm(){const o={...state};numIds.forEach(i=>o[i]=$(i).value);D.form=o;persist()}
-function loadForm(){const o=D.form||{};Object.keys(state).forEach(k=>{if(o[k]!=null)state[k]=o[k]});numIds.forEach(i=>{if(o[i]!=null)$(i).value=o[i]})}
+const WK={ // MET values (Compendium of Physical Activities, approximated)
+ strength:["🏋️ חדר כושר / אימון כוח",4.5],trx:["🔗 TRX / אימון פונקציונלי",6],
+ pilates_mat:["🧘‍♀️ פילאטיס מזרן",3],pilates_ref:["🧘‍♀️ פילאטיס מכשירים",3.5],
+ yoga_calm:["🧘 יוגה רגועה",2.5],yoga_flow:["🧘 יוגה דינמית (וינייאסה / אשטנגה)",4],
+ spinning:["🚴 ספינינג",7.5],zumba:["💃 זומבה / ריקוד",6.5],
+ walk:["🚶 הליכה מהירה",3.5],run:["🏃 ריצה",8],bike:["🚲 אופניים",6.5],hiit:["🔥 HIIT / אימון עצים",8],ball:["⚽ כדורגל / כדורסל",7.5]
+};
+const LIFT_TYPES=["strength","trx"];
+const state={sex:null,job:null,goal:null,pace:"mod",meals:"4",workouts:[]};
+const numIds=["uname","age","height","weight","stepsAvg","target"];
+function migrateWk(o){ // old form: sSess/sMin + cSess/cMin/cInt
+  if(o.workouts)return;const w=[];
+  if(+o.sSess>0)w.push({t:"strength",n:+o.sSess,m:+o.sMin||60});
+  if(+o.cSess>0)w.push({t:{light:"walk",mod:"bike",hard:"hiit"}[o.cInt]||"bike",n:+o.cSess,m:+o.cMin||30});
+  o.workouts=w;
+}
+function renderWk(){
+  const L=$("wkList");if(!L)return;
+  L.innerHTML=state.workouts.length?state.workouts.map((w,i)=>`<div class="wko">
+    <div class="wko-top"><select onchange="state.workouts[${i}].t=this.value;saveForm()">${Object.entries(WK).filter(([k])=>k!=="other").map(([k,[n]])=>`<option value="${k}" ${k===w.t?"selected":""}>${n}</option>`).join("")}</select>
+    <button class="x" onclick="state.workouts.splice(${i},1);renderWk();saveForm()">✕</button></div>
+    <div class="row2"><div class="num"><span class="cap">כמה פעמים בשבוע</span><input type="number" inputmode="numeric" value="${w.n||""}" oninput="state.workouts[${i}].n=+this.value;saveForm()"><span class="unit">פעמים</span></div>
+    <div class="num"><span class="cap">משך אימון</span><input type="number" inputmode="numeric" value="${w.m||""}" oninput="state.workouts[${i}].m=+this.value;saveForm()"><span class="unit">דק׳</span></div></div></div>`).join("")
+    :`<p class="note" style="margin:0 0 8px">לא מתאמנים כרגע? זה בסדר, אפשר להמשיך.</p>`;
+}
+function addWk(){const used=state.workouts.map(w=>w.t);const t=["strength","pilates_mat","yoga_flow","walk"].find(x=>!used.includes(x))||"strength";
+  state.workouts.push({t,n:3,m:t==="walk"?30:(t.startsWith("pilates")||t.startsWith("yoga")?55:60)});renderWk();saveForm()}
+function saveForm(){const o={...state,workouts:state.workouts.map(w=>({...w}))};numIds.forEach(i=>o[i]=$(i).value);D.form=o;persist()}
+function loadForm(){const o=D.form||{};migrateWk(o);Object.keys(state).forEach(k=>{if(o[k]!=null)state[k]=o[k]});numIds.forEach(i=>{if(o[i]!=null)$(i).value=o[i]});state.workouts=(o.workouts||[]).map(w=>({...w}));renderWk()}
 function paintChips(){
   document.querySelectorAll("#vCalc .chips").forEach(g=>{const k=g.dataset.k;
     g.querySelectorAll(".chip").forEach(c=>c.classList.toggle("on",String(state[k])===c.dataset.v))});
@@ -618,8 +636,12 @@ function validate(step){
     const st=v("stepsAvg");
     if(!st&&st!==0)return"הזן ממוצע צעדים יומי (אפשר לבדוק באפליקציית הבריאות בטלפון)";
     if(st<0||st>40000)return"מספר צעדים לא סביר";
-    if((v("sSess")||0)>14||(v("cSess")||0)>14)return"מספר אימונים לא סביר";
-    if((v("sMin")||0)>240||(v("cMin")||0)>240)return"משך אימון עד 240 דקות";
+    for(const w of state.workouts){
+      if(!(w.n>0))return`כמה פעמים בשבוע ${WK[w.t][0].replace(/^\S+\s/,"")}? (או למחוק את האימון)`;
+      if(!(w.m>0))return`כמה דקות נמשך ${WK[w.t][0].replace(/^\S+\s/,"")}?`;
+      if(w.n>14)return"מספר אימונים בשבוע לא סביר (עד 14)";
+      if(w.m>240)return"משך אימון עד 240 דקות";}
+    if(state.workouts.reduce((s,w)=>s+w.n*w.m,0)>1800)return"סך האימונים בשבוע גבוה מאוד (מעל 30 שעות). בדוק שוב";
   }
   if(step===3){
     if(!state.goal)return"בחר מטרה";
@@ -651,10 +673,10 @@ function calc(){
   const base=bmr*0.2;
   const job=bmr*({desk:0,mixed:.08,stand:.15,physical:.28}[state.job]);
   const steps=Math.max(0,(v("stepsAvg")||0)-3000)*0.0004*w;
-  const sS=v("sSess")||0,sM=v("sMin")||0,cS=v("cSess")||0,cM=v("cMin")||0;
-  const strength=sS*(sM/60)*3.5*w/7;
-  const cardio=cS*(cM/60)*({light:3.3,mod:6,hard:8}[state.cInt]-1)*w/7;
-  let tdee=bmr+base+job+steps+strength+cardio;const cap=bmr*2.3;let capped=false;if(tdee>cap){tdee=cap;capped=true}
+  const wkCal=state.workouts.map(x=>({t:x.t,k:x.n*(x.m/60)*(WK[x.t][1]-1)*w/7}));
+  const training=wkCal.reduce((s,x)=>s+x.k,0);
+  const lifts=state.workouts.some(x=>LIFT_TYPES.includes(x.t));
+  let tdee=bmr+base+job+steps+training;const cap=bmr*2.3;let capped=false;if(tdee>cap){tdee=cap;capped=true}
   const g=state.goal;let kcal=tdee,rateKg=0,clamped=false,rateCapped=false;
   if(g==="cut"){let def=w*PACE.cut[state.pace]*7700/7;if(def>tdee*.25){def=tdee*.25;rateCapped=true}
     kcal=tdee-def;const floor=Math.max(sex==="m"?1500:1200,bmr);if(kcal<floor){kcal=floor;clamped=true}rateKg=(tdee-kcal)*7/7700}
@@ -662,20 +684,21 @@ function calc(){
   else if(g==="recomp")kcal=tdee*.92;
   kcal=Math.round(kcal/10)*10;
   const protW=bmi>30?27*hm*hm:w;
-  let P=Math.min(Math.round(protW*{cut:2.2,recomp:2.2,maintain:1.8,bulk:1.8}[g]),250);
+  const ppk=lifts?{cut:2.2,recomp:2.2,maintain:1.8,bulk:1.8}[g]:{cut:1.8,recomp:1.8,maintain:1.6,bulk:1.6}[g];
+  let P=Math.min(Math.round(protW*ppk),250);
   let F=Math.round(Math.max(kcal*.25/9,0.6*w));
   let C=Math.round((kcal-P*4-F*9)/4);
   if(C<60){F=Math.round(Math.max(kcal*.2/9,0.5*w));C=Math.max(0,Math.round((kcal-P*4-F*9)/4))}
-  const trainHrsDay=(sS*sM+cS*cM)/60/7;
+  const trainHrsDay=state.workouts.reduce((s,x)=>s+x.n*x.m,0)/60/7;
   const water=Math.round((w*0.035+trainHrsDay*0.75)*10)/10;
   let weeks=null;const t=v("target");if((g==="cut"||g==="bulk")&&t&&rateKg>0)weeks=Math.ceil(Math.abs(w-t)/rateKg);
-  return{bmr,base,job,steps,strength,cardio,tdee,capped,kcal,g,P,C,F,water,weeks,rateKg,clamped,rateCapped,t,w,bmi,meals:+state.meals,protRef:bmi>30,sex,age:a,height:h};
+  return{bmr,base,job,steps,training,wkCal,lifts,tdee,capped,kcal,g,P,C,F,water,weeks,rateKg,clamped,rateCapped,t,w,bmi,meals:+state.meals,protRef:bmi>30,sex,age:a,height:h};
 }
 function renderRes(R){
   const pk=R.P*4,ck=R.C*4,fk=R.F*9,tot=pk+ck+fk,pct=x=>Math.round(x/tot*100);
   const diff=R.kcal-r10(R.tdee);
   const diffTxt=diff===0?"בדיוק בהוצאה שלך":(diff<0?`גירעון של ${fmt(-diff)} קק״ל ביום`:`עודף של ${fmt(diff)} קק״ל ביום`);
-  const rows=[["חילוף חומרים במנוחה",R.bmr],["חיים יומיומיים ועיכול",R.base],["עבודה",R.job],["צעדים",R.steps],["אימוני כוח",R.strength],["אירובי",R.cardio]];
+  const rows=[["חילוף חומרים במנוחה",R.bmr],["חיים יומיומיים ועיכול",R.base],["עבודה",R.job],["צעדים",R.steps],["אימונים",R.training]];
   const mx=Math.max(...rows.map(r=>r[1]));
   const brk=rows.map(([n,val])=>`<div class="brk-row"><span>${n}</span><div class="track"><div class="fill" style="width:${Math.max(2,val/mx*100)}%"></div></div><b>${fmt(val)}</b></div>`).join("");
   let alerts="";
@@ -719,13 +742,13 @@ function renderRes(R){
       <div class="macro f"><div class="n">${R.F}<small>ג׳</small></div><div class="nm">שומן</div><div class="ex">${fmt(fk)} קק״ל · ${pct(fk)}%</div></div>
     </div>
     <div class="bar"><div style="width:${pct(pk)}%;background:var(--p)"></div><div style="width:${pct(ck)}%;background:var(--c)"></div><div style="width:${pct(fk)}%;background:var(--f)"></div></div>
-    <p class="note">חלבון: ${(R.P/R.w).toFixed(1)} ג׳ לכל ק״ג משקל גוף. זה הנתון הכי חשוב, תעמוד בו קודם כל.</p>
+    <p class="note">חלבון: ${(R.P/R.w).toFixed(1)} ג׳ לכל ק״ג משקל גוף. זה הנתון הכי חשוב, תעמוד בו קודם כל.${R.lifts?"":" בלי אימוני כוח היעד קצת נמוך יותר, וזה מספיק כדי לשמור על השריר."}</p>
   </div>
   <div class="card">
     <div class="sec-title">🔥 איפה הקלוריות שלך נשרפות</div>
     <div class="brk">${brk}</div>
     <div class="brk-total"><span>סה״כ הוצאה יומית</span><span>${fmt(r10(R.tdee))} קק״ל</span></div>
-    <p class="note">חישוב לפי נוסחת Mifflin-St Jeor, ועליה פעילות לפי עבודה, צעדים ואימונים. זאת הערכה טובה, אבל המשקל בפועל אחרי שבועיים הוא שיגיד את האמת.</p>
+    <p class="note">חישוב לפי נוסחת Mifflin-St Jeor, ועליה פעילות לפי עבודה, צעדים וסוג כל אימון. זאת הערכה טובה, אבל המשקל בפועל אחרי שבועיים הוא שיגיד את האמת.</p>
   </div>
   <div class="card">
     <div class="sec-title">🍳 ככה זה נראה בצלחת: ${R.meals} ארוחות</div>
@@ -854,7 +877,7 @@ function startTracking(){
   const R=lastR;if(!R)return;
   const prev=D.plan;
   D.plan={kcal:R.kcal,P:R.P,C:R.C,F:R.F,meals:R.meals,goal:R.g,water:R.water,sex:R.sex,age:R.age,height:R.height,weight:R.w,
-    name:$("uname").value.trim().slice(0,20),target:(R.g==="cut"||R.g==="bulk")&&R.t?R.t:null,
+    name:$("uname").value.trim().slice(0,20),wk:[...new Set(state.workouts.map(x=>x.t))],target:(R.g==="cut"||R.g==="bulk")&&R.t?R.t:null,
     startWeight:prev?.startWeight||R.w,startDate:prev?.startDate||today(),created:Date.now()};
   const tk=today();if(!getDay(tk).weight){getDay(tk).weight=R.w}
   const t=today();const day=getDay(t);day.target=planTarget();persist();
@@ -940,6 +963,10 @@ function renderLog(){
   ${k===today()?suggestion(k):""}
   ${meals}
   <div class="card">
+    <div class="sec-title">🏃 התאמנתי היום</div>
+    <div class="trained" id="trainedBox">${trainedChips(day)}</div>
+  </div>
+  <div class="card">
     <div class="sec-title">💧 מים <span style="font-size:13px;color:var(--muted);font-weight:500;margin-right:auto">${(day.water*0.25).toFixed(2)} / ${T.water||"2.5"} ליטר</span></div>
     <div class="water"><button class="rbtn" onclick="water(-1)">−</button><div class="cups">${[...Array(cups)].map((_,i)=>`<div class="cup ${i<day.water?"on":""}"></div>`).join("")}</div><button class="rbtn" onclick="water(1)">+</button></div>
     <p class="note">כל לחיצה זה כוס של 250 מ״ל</p>
@@ -1003,6 +1030,14 @@ function meCard(){
    <div class="quote">${quote(st,cur)}</div>
   </div>`;
 }
+function trainedChips(day){
+  const mine=(D.plan.wk&&D.plan.wk.length)?D.plan.wk:["strength","walk"];
+  const opts=[...new Set([...mine,...(day.trained||[])])];
+  return opts.map(t=>`<button class="${(day.trained||[]).includes(t)?"on":""}" onclick="toggleTrained('${t}')">${WK[t]?WK[t][0]:t}</button>`).join("")
+    +`<button class="${(day.trained||[]).includes("other")?"on":""}" onclick="toggleTrained('other')">➕ אחר</button>`;
+}
+function toggleTrained(t){const d=getDay(logDate);d.trained=d.trained||[];const i=d.trained.indexOf(t);if(i>=0)d.trained.splice(i,1);else d.trained.push(t);persist();$("trainedBox").innerHTML=trainedChips(d)}
+WK.other=["➕ אחר",4];
 function moveDay(n){const nk=addDays(logDate,n);if(nk>today())return;logDate=nk;renderLog()}
 function water(n){const d=getDay(logDate);d.water=Math.max(0,Math.min(30,d.water+n));persist();renderLog()}
 function delItem(ix){getDay(logDate).items.splice(ix,1);persist();afterChange()}
@@ -1167,7 +1202,7 @@ function renderProg(){
   const hk=Object.keys(D.days).filter(k=>D.days[k].items.length||D.days[k].weight).sort().reverse().slice(0,30);
   const hist=hk.length?hk.map(k=>{const tt=totals(k,false),T=D.days[k].target||planTarget(),s=dayStatus(k);
     const ic=(k===today()&&s!=="ok")?"⏳":{ok:"✅",miss:"✖️",late:"⏱",none:"·"}[s];
-    return`<div class="hr" onclick="logDate='${k}';setView('log')"><div>${niceDate(k)}<br><small>ח ${Math.round(tt.P)}/${T.P} ג׳${D.days[k].steps?` · ${fmt(D.days[k].steps)} צעדים`:""}</small></div><span>${fmt(tt.kcal)} <small>/ ${fmt(T.kcal)}</small></span><span class="st">${ic}</span></div>`}).join("")
+    return`<div class="hr" onclick="logDate='${k}';setView('log')"><div>${niceDate(k)}<br><small>ח ${Math.round(tt.P)}/${T.P} ג׳${D.days[k].steps?` · ${fmt(D.days[k].steps)} צעדים`:""}${(D.days[k].trained||[]).length?" · 💪 אימון":""}</small></div><span>${fmt(tt.kcal)} <small>/ ${fmt(T.kcal)}</small></span><span class="st">${ic}</span></div>`}).join("")
     :`<div class="empty" style="padding:16px">עוד לא רשמת ימים</div>`;
 
   el.innerHTML=`${meCard()}
