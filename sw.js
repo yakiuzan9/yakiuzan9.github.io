@@ -1,6 +1,6 @@
 // מחשבון קלוריות – יקי אוזן | service worker
 // כל עדכון: להעלות את המספר כדי שהמשתמשים יקבלו את הגרסה החדשה
-const VERSION = "v4";
+const VERSION = "v5";
 const CACHE = "yu-cal-" + VERSION;
 const SHELL = ["./", "index.html", "manifest.webmanifest",
   "icons/icon-192.png", "icons/icon-512.png", "icons/maskable-512.png", "icons/apple-touch-icon.png"];
@@ -17,6 +17,9 @@ self.addEventListener("fetch", e => {
   const req = e.request;
   if (req.method !== "GET" || new URL(req.url).origin !== location.origin) return;
   if (req.mode === "navigate") {
+    // רק הדף הראשי של המחשבון נשמר. דפים אחרים באתר (למשל /english/) עוברים ישר לרשת
+    const p = new URL(req.url).pathname;
+    if (p !== "/" && p !== "/index.html") return;
     e.respondWith(fetch(req).then(r => { const cp = r.clone(); caches.open(CACHE).then(c => c.put("index.html", cp)); return r; })
       .catch(() => caches.match("index.html")));
     return;
