@@ -1,6 +1,6 @@
 // הכתבה באנגלית – יקי אוזן | service worker (רק לתיקייה /english/)
 // כל עדכון של המילים: להעלות את המספר כדי שכולם יקבלו את הגרסה החדשה
-const VERSION = "v3";
+const VERSION = "v4";
 const CACHE = "yu-eng-" + VERSION;
 const SHELL = ["./", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png", "icons/maskable-512.png", "icons/apple-touch-icon.png"];
 
