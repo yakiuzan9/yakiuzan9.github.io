@@ -122,6 +122,7 @@ input.answer:focus{outline:none;border-color:var(--accent)}
 .ibox.up{background:var(--hl);color:var(--hl-ink);border-color:var(--hl)}
 .ibox .url{direction:ltr;font-weight:700;user-select:all;word-break:break-all}
 a.btn{text-decoration:none;display:block}
+.tipw{font-size:1rem;font-weight:600;background:var(--paper);color:var(--ink);border:1.5px dashed var(--rule);border-radius:12px;padding:6px 12px}
 .note{font-size:.85rem;color:var(--soft);margin-top:24px}
 .tip{background:var(--card);border:2px dashed var(--rule);border-radius:14px;padding:12px 14px;font-size:.95rem;margin-top:18px}
 @keyframes pop{0%{transform:scale(.6);opacity:.2}60%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
@@ -143,7 +144,7 @@ a.btn{text-decoration:none;display:block}
     <div class="ibox" id="installBox" hidden></div>
     <header class="top">
       <h1>הכתבה באנגלית ד׳4</h1>
-      <p class="sub">11 מילים עם הצליל <span class="en ch">ch</span> (כולל מילת בונוס <span class="en">spinach</span>). בוחרים משחק ומתאמנים.</p>
+      <p class="sub">הכתבה מס׳ 3: 11 מילים עם הצליל <span class="en ch">th</span> (כולל מילת בונוס <span class="en">vegetables</span>). בוחרים משחק ומתאמנים.</p>
       <span class="count" id="countdown"></span>
     </header>
     <div class="wordstrip" id="strip"></div>
@@ -183,30 +184,30 @@ a.btn{text-decoration:none;display:block}
 
 <script>
 const WORDS=[
- {en:'chin',he:'סנטר',pic:'🧔',ex:'I touch my chin.'},
- {en:'chop',he:'לקצוץ / לחתוך',pic:'🔪',ex:'Chop the carrots.'},
- {en:'chips',he:"צ'יפס / תפוצ'יפס",pic:'🍟',ex:'I like chips.'},
- {en:'chair',he:'כיסא',pic:'🪑',ex:'Sit on the chair.'},
- {en:'bench',he:'ספסל',pic:'<svg width="1.3em" height="1em" viewBox="0 0 64 48" role="img" aria-label="ספסל"><rect x="6" y="6" width="52" height="6" rx="2" fill="#b5763a"/><rect x="6" y="15" width="52" height="6" rx="2" fill="#c98a4b"/><rect x="12" y="21" width="4" height="8" fill="#5a5f6b"/><rect x="48" y="21" width="4" height="8" fill="#5a5f6b"/><rect x="3" y="28" width="58" height="7" rx="2" fill="#b5763a"/><rect x="9" y="35" width="5" height="11" fill="#5a5f6b"/><rect x="50" y="35" width="5" height="11" fill="#5a5f6b"/></svg>',ex:'We sit on the bench.'},
- {en:'cheese',he:'גבינה',pic:'🧀',ex:'I eat cheese.'},
- {en:'chart',he:'טבלה / תרשים',pic:'📊',ex:'Look at the chart.'},
- {en:'chimp',he:'שימפנזה',pic:'🐒',ex:'The chimp is funny.'},
- {en:'chicken',he:'תרנגולת / עוף',pic:'🐔',ex:'The chicken says cluck.'},
- {en:'kitchen',he:'מטבח',pic:'🍳',ex:'Mom is in the kitchen.'},
- {en:'spinach',he:'תרד',pic:'🥬',ex:'Popeye eats spinach.'}
+ {en:'mouth',he:'פה',pic:'👄',ex:'Open your mouth.',tip:'ou באמצע, כמו ב-out: m-ou-th'},
+ {en:'teeth',he:'שיניים',pic:'🦷',ex:'I brush my teeth.',tip:'שתי e באמצע: t-ee-th'},
+ {en:'three',he:'שלוש',pic:'3️⃣',ex:'I have three books.',tip:'גם כאן שתי e בסוף: thr-ee'},
+ {en:'then',he:'אז',pic:'1️⃣➜2️⃣',ex:'I eat, then I play.',tip:'th "רכה": שמים את הלשון בין השיניים ומזמזמים'},
+ {en:'thirsty',he:'צמא / צמאה',pic:'🥵💧',ex:'I am thirsty. I want water.',tip:'ir באמצע: th-ir-s-ty'},
+ {en:'father',he:'אבא',pic:'👨‍👧',ex:'My father is tall.',tip:'f-a-th-er. נגמר ב-er'},
+ {en:'mother',he:'אמא',pic:'👩‍👧',ex:'My mother is nice.',tip:'m-o-th-er. כמו father, רק עם m ו-o'},
+ {en:'thank you',he:'תודה',pic:'🙏',ex:'Thank you, teacher!',tip:'שתי מילים נפרדות: thank + you'},
+ {en:'grandfather',he:'סבא',pic:'👴',ex:'My grandfather is old.',tip:'מילה אחת מחוברת: grand + father'},
+ {en:'grandmother',he:'סבתא',pic:'👵',ex:'My grandmother makes cake.',tip:'מילה אחת מחוברת: grand + mother'},
+ {en:'vegetables',he:'ירקות',pic:'🥕🥦🥒',ex:'I eat vegetables.',tip:'veg-e-ta-bles. נגמר ב-les'}
 ];
 const TITLES={flash:'כרטיסיות',enhe:'מה זה בעברית?',match:'התאמה',hear:'שומעים ובוחרים',scramble:'מסדרים אותיות',missing:'אותיות חסרות',heen:'מעברית לאנגלית',dict:'הכתבה קולית',test:'מבחן הכתבה',testhe:'מבחן מעברית לאנגלית'};
 const isTest=m=>m==='test'||m==='testhe';
 function speakHe(t){if(!canSpeak())return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t.replace(/\s*\/\s*/g,', '));u.lang='he-IL';const hv=speechSynthesis.getVoices().find(v=>/^(he|iw)/i.test(v.lang));if(hv)u.voice=hv;u.rate=.85;speechSynthesis.speak(u)}catch(e){}}
 const $=s=>document.querySelector(s);
 const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
-const hl=w=>w.replace(/ch/,'<span class="ch">ch</span>');
+const hl=w=>w.replace(/th/g,'<span class="ch">th</span>');
 const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 /* storage */
 let store={};
-try{store=JSON.parse(localStorage.getItem('dict2')||'{}')}catch(e){store={}}
-const save=()=>{try{localStorage.setItem('dict2',JSON.stringify(store))}catch(e){}};
+try{store=JSON.parse(localStorage.getItem('dict3')||'{}')}catch(e){store={}}
+const save=()=>{try{localStorage.setItem('dict3',JSON.stringify(store))}catch(e){}};
 function setBest(mode,score,total){const p=Math.round(score/total*100);if(!store[mode]||p>store[mode])store[mode]=p;save();renderStars()}
 function renderStars(){document.querySelectorAll('[data-s]').forEach(el=>{const v=store[el.dataset.s];el.textContent=v==null?'עוד לא שיחקת':'הכי טוב: '+v+'%'+(v===100?' ⭐':'')})}
 
@@ -219,8 +220,8 @@ function speak(t,rate=.8){if(!canSpeak())return false;try{speechSynthesis.cancel
 if(!canSpeak())$('#voiceNote').textContent='במכשיר הזה אין הקראה קולית. במשחקי השמיעה יופיע רמז בעברית במקום.';
 
 /* countdown */
-(function(){const t=new Date(2026,10,2);const n=new Date();n.setHours(0,0,0,0);const d=Math.round((t-n)/864e5);const el=$('#countdown');
- if(d>1)el.textContent='עוד '+d+' ימים להכתבה (2.11)';else if(d===1)el.textContent='ההכתבה מחר!';else if(d===0)el.textContent='ההכתבה היום, בהצלחה!';else el.hidden=true})();
+(function(){const t=new Date(2026,10,16);const n=new Date();n.setHours(0,0,0,0);const d=Math.round((t-n)/864e5);const el=$('#countdown');
+ if(d>1)el.textContent='עוד '+d+' ימים להכתבה (16.11)';else if(d===1)el.textContent='ההכתבה מחר!';else if(d===0)el.textContent='ההכתבה היום, בהצלחה!';else el.hidden=true})();
 /* own site vs. old Claude link */
 const inFrame=(()=>{try{return window.top!==window.self}catch(e){return true}})();
 const OWN_SITE=/github\.io$/i.test(location.hostname)&&!inFrame;
@@ -257,6 +258,7 @@ function next(){if(!queue.length)return finish();cur=queue.shift();firstTry=true
 function right(){if(firstTry)correctCount++;doneSet.add(cur.en);setProg()}
 function wrong(){if(firstTry){firstTry=false;const pos=Math.min(queue.length,3);queue.splice(pos,0,cur)}}
 const norm=s=>s.trim().toLowerCase().replace(/\s+/g,'');
+const key=w=>norm(w.en);
 function diffHTML(typed,correct){let o='';for(let i=0;i<correct.length;i++){o+=typed[i]===correct[i]?correct[i]:'<span class="x">'+correct[i]+'</span>'}return o}
 
 function speakBtn(w){return `<button class="speak" id="sp" aria-label="השמע את המילה">🔊</button>
@@ -269,10 +271,10 @@ function typeBlock(){return `<input class="answer" id="ans" autocomplete="off" a
  <div class="row center"><button class="btn" id="check">בדיקה</button>${!isTest(mode)?'<button class="btn ghost" id="hint">רמז</button>':''}</div>`}
 function wireType(w,{onHint}={}){const ans=$('#ans'),fb=$('#fb');ans.focus({preventScroll:true});let hints=0;
  const check=()=>{const v=norm(ans.value);if(!v)return;
-  if(isTest(mode)){testAnswers.push({w,v});if(v===w.en)correctCount++;doneSet.add(w.en);setProg();return next()}
-  if(v===w.en){fb.className='feedback good pop';fb.textContent='נכון! '+(firstTry?'⭐':'');right();speak(w.en);
+  if(isTest(mode)){testAnswers.push({w,v});if(v===key(w))correctCount++;doneSet.add(w.en);setProg();return next()}
+  if(v===key(w)){fb.className='feedback good pop';fb.textContent='נכון! '+(firstTry?'⭐':'');right();speak(w.en);
    $('#check').textContent='הבא ←';$('#check').onclick=next;ans.disabled=true;ans.onkeydown=null;setTimeout(()=>$('#check').focus(),30)}
-  else{fb.className='feedback bad';fb.textContent='כמעט! ככה כותבים:';$('#extra').innerHTML='<div class="diff">'+diffHTML(v,w.en)+'</div>';wrong();ans.value='';ans.focus();speak(w.en,.6)}};
+  else{fb.className='feedback bad';fb.textContent='כמעט! ככה כותבים:';$('#extra').innerHTML='<div class="diff">'+diffHTML(v,key(w))+'</div>'+(w.tip?'<div class="tipw">💡 '+w.tip+'</div>':'');wrong();ans.value='';ans.focus();speak(w.en,.6)}};
  $('#check').onclick=check;ans.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();if(!ans.disabled)check();else next()}};
  const h=$('#hint');if(h)h.onclick=()=>{hints++;firstTry=false;const n=Math.min(w.en.length,hints+1);$('#extra').innerHTML='<div class="diff">'+w.en.slice(0,n)+'_'.repeat(w.en.length-n).split('').join(' ')+'</div>';if(onHint)onHint()}}
 
@@ -289,10 +291,10 @@ const render={
  dict(w){stage.innerHTML=`<div class="prompt">הקשב וכתוב את המילה</div>${speakBtn(w)}${typeBlock()}`;wireSpeak(w);setTimeout(()=>speak(w.en),250);wireType(w,{onHint:()=>{}})},
  test(w){const n=total-queue.length;stage.innerHTML=`<div class="prompt">מילה ${n} מתוך ${total}</div>${speakBtn(w)}${typeBlock()}`;$('#check').textContent='הבא ←';wireSpeak(w);setTimeout(()=>speak(w.en),250);wireType(w)},
  testhe(w){const n=total-queue.length;stage.innerHTML=`<div class="prompt">מילה ${n} מתוך ${total} · כתוב באנגלית</div><button class="speak" id="sphe" aria-label="השמע בעברית">🔊</button><div class="heword">${w.he}</div>${typeBlock()}`;$('#check').textContent='הבא ←';$('#sphe').onclick=()=>speakHe(w.he);setTimeout(()=>speakHe(w.he),250);wireType(w)},
- missing(w){const idx=[];const L=w.en.length;const k=L<=4?1:L<=5?2:3;const cand=shuffle([...Array(L).keys()]).slice(0,k).sort((a,b)=>a-b);
-  const shown=w.en.split('').map((c,i)=>cand.includes(i)?'_':c).join(' ');
+ missing(w){const idx=[];const L=w.en.length;const k=L<=4?1:L<=5?2:3;const cand=shuffle([...Array(L).keys()].filter(i=>w.en[i]!==' ')).slice(0,k).sort((a,b)=>a-b);
+  const shown=w.en.split('').map((c,i)=>c===' '?'&nbsp;&nbsp;':cand.includes(i)?'_':c).join(' ');
   stage.innerHTML=`<div class="prompt">השלם את האותיות החסרות וכתוב את כל המילה</div><div class="pic">${w.pic}</div><div class="bigword" style="letter-spacing:.15em">${shown}</div><div class="prompt">${w.he}</div>${typeBlock()}`;wireType(w)},
- scramble(w){let letters=w.en.split('');let mix;do{mix=shuffle(letters.map((c,i)=>({c,i})))}while(mix.map(x=>x.c).join('')===w.en);
+ scramble(w){let letters=key(w).split('');let mix;do{mix=shuffle(letters.map((c,i)=>({c,i})))}while(mix.map(x=>x.c).join('')===key(w));
   let built=[];
   stage.innerHTML=`<div class="prompt">סדר את האותיות</div><div class="pic">${w.pic}</div><div class="prompt">${w.he}</div><div class="slots" id="slots"></div><div class="tiles" id="tiles"></div><div class="feedback" id="fb"></div><div class="row center"><button class="btn ghost small" id="sp3">🔊 שמע</button></div>`;
   $('#sp3').onclick=()=>speak(w.en);
@@ -301,7 +303,7 @@ const render={
    document.querySelectorAll('.tile').forEach(b=>b.onclick=()=>{built.push(mix[b.dataset.j]);draw();if(built.length===letters.length)judge()});
    document.querySelectorAll('.slot').forEach(s=>s.onclick=()=>{const i=+s.dataset.i;if(built[i]&&!stage.dataset.lock){built=built.slice(0,i);draw()}})};
   const judge=()=>{const v=built.map(t=>t.c).join('');const fb=$('#fb');
-   if(v===w.en){fb.className='feedback good pop';fb.textContent='מצוין! '+(firstTry?'⭐':'');right();speak(w.en);stage.dataset.lock=1;setTimeout(()=>{delete stage.dataset.lock;next()},1100)}
+   if(v===key(w)){fb.className='feedback good pop';fb.textContent='מצוין! '+(firstTry?'⭐':'');right();speak(w.en);stage.dataset.lock=1;setTimeout(()=>{delete stage.dataset.lock;next()},1100)}
    else{fb.className='feedback bad';fb.textContent='לא בדיוק, נסה שוב';wrong();setTimeout(()=>{built=[];draw()},700)}};
   draw()}
 };
@@ -312,7 +314,7 @@ function flash(i){const w=WORDS[i];doneSet.add(w.en);setProg();
  <div class="row center"><button class="btn ghost small" id="sp4">🔊 מילה</button><button class="btn ghost small" id="sp5">🐢 לאט</button><button class="btn ghost small" id="sp6">במשפט</button></div>
  <div class="row center"><button class="btn ghost" id="prev">→ הקודם</button><button class="btn" id="nx">${i<total-1?'הבא ←':'סיום'}</button></div>`;
  let flipped=false;const card=$('#card');
- card.onclick=()=>{flipped=!flipped;card.innerHTML=flipped?`<div class="face back pop"><div class="heword">${w.he}</div><div class="ex">${w.ex}</div></div>`:`<div class="face front"><div class="pic">${w.pic}</div><div class="bigword">${hl(w.en)}</div></div>`};
+ card.onclick=()=>{flipped=!flipped;card.innerHTML=flipped?`<div class="face back pop"><div class="heword">${w.he}</div><div class="ex">${w.ex}</div>${w.tip?'<div class="tipw">💡 '+w.tip+'</div>':''}</div>`:`<div class="face front"><div class="pic">${w.pic}</div><div class="bigword">${hl(w.en)}</div></div>`};
  $('#sp4').onclick=()=>speak(w.en);$('#sp5').onclick=()=>speak(w.en,.5);$('#sp6').onclick=()=>speak(w.ex);
  $('#prev').onclick=()=>flash(Math.max(0,i-1));
  $('#nx').onclick=()=>{if(i<total-1)flash(i+1);else{setBest('flash',1,1);finishSimple('עברת על כל הכרטיסיות!')}};
@@ -331,7 +333,7 @@ function finishSimple(msg){stage.innerHTML=`<div class="result"><div class="scor
 function finish(){setBest(mode,correctCount,total);const p=Math.round(correctCount/total*100);
  const msg=p===100?'מושלם! אתה מוכן להכתבה':p>=80?'כל הכבוד! עוד קצת ואתה שם':p>=50?'יפה! כדאי לתרגל עוד סבב':'מתחילים טוב, בוא ננסה שוב';
  let list='';
- if(isTest(mode)){const bad=testAnswers.filter(a=>a.v!==a.w.en);if(bad.length)list='<div class="mistakes"><b>מילים לתרגל:</b>'+bad.map(a=>`<div><span class="en" style="text-decoration:line-through;opacity:.7">${esc(a.v)}</span><b class="en">${a.w.en}</b><span>${a.w.he}</span></div>`).join('')+'</div>'}
+ if(isTest(mode)){const bad=testAnswers.filter(a=>a.v!==key(a.w));if(bad.length)list='<div class="mistakes"><b>מילים לתרגל:</b>'+bad.map(a=>`<div><span class="en" style="text-decoration:line-through;opacity:.7">${esc(a.v)}</span><b class="en">${a.w.en}</b><span>${a.w.he}</span></div>`).join('')+'</div>'}
  const scoreTxt=isTest(mode)?`${correctCount}/${total}`:`${p}%`;
  stage.innerHTML=`<div class="result"><div class="prompt">${isTest(mode)?'ציון במבחן':'נכון מהניסיון הראשון'}</div><div class="score pop">${scoreTxt}</div><h2>${msg}</h2>${list}<div class="row center"><button class="btn" id="again">עוד פעם</button><button class="btn ghost" id="hm">לתפריט</button></div></div>`;
  $('#again').onclick=()=>start(mode);$('#hm').onclick=home;if(p===100)speak('Great job!',.9)}
