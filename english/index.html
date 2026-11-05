@@ -10,6 +10,13 @@
 <meta property="og:description" content="משחק תרגול להכתבה באנגלית: כרטיסיות, התאמה, הכתבה קולית ומבחן.">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="he_IL">
+<meta name="theme-color" content="#fff176">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="אנגלית">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Rubik:wght@400;500;700;800&display=swap">
@@ -49,7 +56,7 @@ header.top{display:flex;flex-direction:column;gap:6px;margin-bottom:18px}
 .sub{color:var(--soft);margin:0}
 .count{display:inline-flex;align-self:flex-start;gap:6px;align-items:center;background:var(--hl);color:var(--hl-ink);font-weight:700;padding:4px 12px;border-radius:999px;font-size:.95rem}
 .wordstrip{display:flex;flex-wrap:wrap;gap:8px;direction:ltr;justify-content:flex-end;margin:10px 0 22px}
-.wordstrip span{font-family:var(--f-word);font-size:1.1rem;background:var(--card);border:1.5px solid var(--rule);border-radius:10px;padding:2px 10px}
+.wordstrip>span{font-family:var(--f-word);font-size:1.1rem;background:var(--card);border:1.5px solid var(--rule);border-radius:10px;padding:2px 10px}
 .section-label{font-size:.8rem;letter-spacing:.06em;color:var(--soft);font-weight:700;margin:22px 0 8px}
 .modes{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .mode{all:unset;cursor:pointer;background:var(--card);border:2px solid var(--rule);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:4px;box-shadow:var(--shadow);min-width:0}
@@ -110,6 +117,11 @@ input.answer:focus{outline:none;border-color:var(--accent)}
 .mistakes{width:100%;text-align:right;display:flex;flex-direction:column;gap:6px}
 .mistakes div{display:flex;justify-content:space-between;gap:10px;background:var(--bad-bg);border-radius:10px;padding:8px 12px}
 .credit{text-align:center;font-size:.8rem;color:var(--soft);margin-top:32px;padding-top:12px;border-top:1px solid var(--rule)}
+.ibox{background:var(--card);border:2px solid var(--accent);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.ibox b{font-size:1.05rem}
+.ibox.up{background:var(--hl);color:var(--hl-ink);border-color:var(--hl)}
+.ibox .url{direction:ltr;font-weight:700;user-select:all;word-break:break-all}
+a.btn{text-decoration:none;display:block}
 .note{font-size:.85rem;color:var(--soft);margin-top:24px}
 .tip{background:var(--card);border:2px dashed var(--rule);border-radius:14px;padding:12px 14px;font-size:.95rem;margin-top:18px}
 @keyframes pop{0%{transform:scale(.6);opacity:.2}60%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
@@ -122,6 +134,13 @@ input.answer:focus{outline:none;border-color:var(--accent)}
 <body>
 <div class="wrap" dir="rtl">
   <section id="home">
+    <div class="ibox up" id="upBox" hidden>
+      <b>⭐ שדרגנו! הסימולטור עבר לאתר קבוע</b>
+      <span>שם הקישור לא משתנה בכל הכתבה חדשה, ואפשר להתקין אותו כאפליקציה בטלפון. כאן הכל ממשיך לעבוד כרגיל.</span>
+      <a class="btn" href="https://yakiuzan9.github.io/english/" target="_blank" rel="noopener">לאתר החדש ←</a>
+      <span class="url">yakiuzan9.github.io/english</span>
+    </div>
+    <div class="ibox" id="installBox" hidden></div>
     <header class="top">
       <h1>הכתבה באנגלית ד׳4</h1>
       <p class="sub">11 מילים עם הצליל <span class="en ch">ch</span> (כולל מילת בונוס <span class="en">spinach</span>). בוחרים משחק ומתאמנים.</p>
@@ -202,6 +221,24 @@ if(!canSpeak())$('#voiceNote').textContent='במכשיר הזה אין הקרא�
 /* countdown */
 (function(){const t=new Date(2026,10,2);const n=new Date();n.setHours(0,0,0,0);const d=Math.round((t-n)/864e5);const el=$('#countdown');
  if(d>1)el.textContent='עוד '+d+' ימים להכתבה (2.11)';else if(d===1)el.textContent='ההכתבה מחר!';else if(d===0)el.textContent='ההכתבה היום, בהצלחה!';else el.hidden=true})();
+/* own site vs. old Claude link */
+const inFrame=(()=>{try{return window.top!==window.self}catch(e){return true}})();
+const OWN_SITE=/github\.io$/i.test(location.hostname)&&!inFrame;
+if(!OWN_SITE)$('#upBox').hidden=false;
+const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+let deferredPrompt=null;
+const instX=()=>{try{return localStorage.getItem('eng_install_x')==='1'}catch(e){return false}};
+function showInstall(){const box=$('#installBox');if(!OWN_SITE||standalone||instX())return;
+ const ios=/iphone|ipad|ipod/i.test(navigator.userAgent),inApp=/Instagram|FBAN|FBAV|WhatsApp/i.test(navigator.userAgent);
+ if(deferredPrompt){box.innerHTML='<b>📲 להתקין כאפליקציה?</b><span>אייקון במסך הבית, נפתח בלחיצה ועובד גם בלי אינטרנט.</span><div class="row"><button class="btn small" id="doInst">התקן עכשיו</button><button class="btn ghost small" id="noInst">לא עכשיו</button></div>';box.hidden=false;$('#doInst').onclick=doInstall;$('#noInst').onclick=hideInstall}
+ else if(ios&&!inApp){box.innerHTML='<b>📲 להתקנה כאפליקציה באייפון:</b><span>לוחצים על כפתור השיתוף ⬆️ בתחתית ספארי, ואז "הוסף למסך הבית".</span><div class="row"><button class="btn ghost small" id="noInst">הבנתי</button></div>';box.hidden=false;$('#noInst').onclick=hideInstall}
+ else if(inApp){box.innerHTML='<b>📲 רוצים להתקין כאפליקציה?</b><span>פותחים את הקישור בדפדפן (שלוש הנקודות ← "פתח בדפדפן"), ושם יופיע כפתור התקנה.</span><div class="row"><button class="btn ghost small" id="noInst">הבנתי</button></div>';box.hidden=false;$('#noInst').onclick=hideInstall}}
+function hideInstall(){try{localStorage.setItem('eng_install_x','1')}catch(e){}$('#installBox').hidden=true}
+async function doInstall(){if(!deferredPrompt)return;deferredPrompt.prompt();try{await deferredPrompt.userChoice}catch(e){}deferredPrompt=null;hideInstall()}
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;showInstall()});
+window.addEventListener('appinstalled',hideInstall);
+if(OWN_SITE&&'serviceWorker' in navigator){navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(()=>{})}
+setTimeout(showInstall,1500);
 $('#strip').innerHTML=WORDS.map(w=>'<span>'+hl(w.en)+'</span>').join('');
 renderStars();
 
