@@ -150,7 +150,7 @@ a.btn{text-decoration:none;display:block}
     <div class="ibox" id="installBox" hidden></div>
     <header class="top">
       <h1>הכתבה באנגלית ד׳4</h1>
-      <p class="sub">הכתבה מס׳ 3: 11 מילים עם הצליל <span class="en ch">th</span> (כולל מילת בונוס <span class="en">vegetables</span>). בוחרים משחק ומתאמנים.</p>
+      <p class="sub" id="sub"></p>
       <span class="count" id="countdown"></span>
     </header>
     <div class="wordstrip" id="strip"></div>
@@ -169,7 +169,7 @@ a.btn{text-decoration:none;display:block}
       <button class="mode" data-mode="missing"><b>אותיות חסרות</b><small>משלימים את המילה</small><span class="stars" data-s="missing"></span></button>
       <button class="mode" data-mode="heen"><b>מעברית לאנגלית</b><small>רואים בעברית, כותבים באנגלית</small><span class="stars" data-s="heen"></span></button>
       <button class="mode" data-mode="dict"><b>הכתבה קולית</b><small>שומעים וכותבים, עם עזרה</small><span class="stars" data-s="dict"></span></button>
-      <button class="mode big" data-mode="test"><b>מבחן הכתבה אמיתי</b><small>כל 11 המילים, בלי רמזים, ציון בסוף, כמו בכיתה</small><span class="stars" data-s="test"></span></button>
+      <button class="mode big" data-mode="test"><b>מבחן הכתבה אמיתי</b><small>כל המילים, בלי רמזים, ציון בסוף, כמו בכיתה</small><span class="stars" data-s="test"></span></button>
       <button class="mode big alt" data-mode="testhe"><b>מבחן מעברית לאנגלית</b><small>שומעים מילה בעברית (ספסל) וכותבים באנגלית (bench). בלי רמזים, ציון בסוף</small><span class="stars" data-s="testhe"></span></button>
     </div>
 
@@ -189,6 +189,13 @@ a.btn{text-decoration:none;display:block}
 </div>
 
 <script>
+/* ===== הגדרות ההכתבה – זה החלק היחיד שמשנים בכל הכתבה חדשה ===== */
+const DICT={
+ num:3,               // מספר ההכתבה
+ date:'2026-11-16',   // תאריך ההכתבה (שנה-חודש-יום)
+ sound:'th',          // הצליל שמודגש בצהוב בכל מילה
+ bonus:'vegetables'   // מילת הבונוס (או '' אם אין)
+};
 const WORDS=[
  {en:'mouth',he:'פה',pic:'<svg width="1.5em" height="1.1em" viewBox="0 0 88 64" role="img" aria-label="פה"><circle cx="32" cy="32" r="29" fill="#ffd166" stroke="#d9a520" stroke-width="2"/><circle cx="21" cy="24" r="3.5" fill="#1d2547"/><circle cx="43" cy="24" r="3.5" fill="#1d2547"/><ellipse cx="32" cy="44" rx="13" ry="10" fill="#8f1d2c" stroke="#d23b4a" stroke-width="3"/><rect x="22" y="35.5" width="20" height="5" rx="2" fill="#fff"/><ellipse cx="32" cy="50" rx="7" ry="3.5" fill="#ff8fa3"/><path d="M84 44 H52" stroke="#2f5bd3" stroke-width="5" stroke-linecap="round"/><path d="M50 44 l10 -8 v16 z" fill="#2f5bd3"/></svg>',ex:'Open your mouth.',tip:'ou באמצע, כמו ב-out: m-ou-th'},
  {en:'teeth',he:'שיניים',pic:'🦷🦷',ex:'I brush my teeth.',tip:'שתי e באמצע: t-ee-th'},
@@ -207,13 +214,13 @@ const isTest=m=>m==='test'||m==='testhe';
 function speakHe(t){if(!canSpeak())return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t.replace(/\s*\/\s*/g,', '));u.lang='he-IL';const hv=speechSynthesis.getVoices().find(v=>/^(he|iw)/i.test(v.lang));if(hv)u.voice=hv;u.rate=.85;speechSynthesis.speak(u)}catch(e){}}
 const $=s=>document.querySelector(s);
 const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
-const hl=w=>w.replace(/th/g,'<span class="ch">th</span>');
+const hl=w=>DICT.sound?w.split(DICT.sound).join('<span class="ch">'+DICT.sound+'</span>'):w;
 const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 /* storage */
 let store={};
-try{store=JSON.parse(localStorage.getItem('dict3')||'{}')}catch(e){store={}}
-const save=()=>{try{localStorage.setItem('dict3',JSON.stringify(store))}catch(e){}};
+try{store=JSON.parse(localStorage.getItem('dict'+DICT.num)||'{}')}catch(e){store={}}
+const save=()=>{try{localStorage.setItem('dict'+DICT.num,JSON.stringify(store))}catch(e){}};
 function setBest(mode,score,total){const p=Math.round(score/total*100);if(!store[mode]||p>store[mode])store[mode]=p;save();renderStars()}
 function renderStars(){document.querySelectorAll('[data-s]').forEach(el=>{const v=store[el.dataset.s];el.textContent=v==null?'עוד לא שיחקת':'הכי טוב: '+v+'%'+(v===100?' ⭐':'')})}
 
@@ -226,8 +233,8 @@ function speak(t,rate=.8){if(!canSpeak())return false;try{speechSynthesis.cancel
 if(!canSpeak())$('#voiceNote').textContent='במכשיר הזה אין הקראה קולית. במשחקי השמיעה יופיע רמז בעברית במקום.';
 
 /* countdown */
-(function(){const t=new Date(2026,10,16);const n=new Date();n.setHours(0,0,0,0);const d=Math.round((t-n)/864e5);const el=$('#countdown');
- if(d>1)el.textContent='עוד '+d+' ימים להכתבה (16.11)';else if(d===1)el.textContent='ההכתבה מחר!';else if(d===0)el.textContent='ההכתבה היום, בהצלחה!';else el.hidden=true})();
+(function(){const [Y,M,D]=DICT.date.split('-').map(Number);const t=new Date(Y,M-1,D);const dm=D+'.'+M;const n=new Date();n.setHours(0,0,0,0);const d=Math.round((t-n)/864e5);const el=$('#countdown');
+ if(d>1)el.textContent='עוד '+d+' ימים להכתבה ('+dm+')';else if(d===1)el.textContent='ההכתבה מחר!';else if(d===0)el.textContent='ההכתבה היום, בהצלחה!';else el.hidden=true})();
 /* own site vs. old Claude link */
 const inFrame=(()=>{try{return window.top!==window.self}catch(e){return true}})();
 const OWN_SITE=/github\.io$/i.test(location.hostname)&&!inFrame;
@@ -246,6 +253,7 @@ window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPro
 window.addEventListener('appinstalled',hideInstall);
 if(OWN_SITE&&'serviceWorker' in navigator){navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(()=>{})}
 setTimeout(showInstall,1500);
+$('#sub').innerHTML='הכתבה מס׳ '+DICT.num+': '+WORDS.length+' מילים'+(DICT.sound?' עם הצליל <span class="en ch">'+DICT.sound+'</span>':'')+(DICT.bonus?' (כולל מילת בונוס <span class="en">'+DICT.bonus+'</span>)':'')+'. בוחרים משחק ומתאמנים.';
 $('#strip').innerHTML=WORDS.map(w=>'<span>'+hl(w.en)+'</span>').join('');
 renderStars();
 
